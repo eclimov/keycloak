@@ -15,7 +15,7 @@ jobs:
                 git pull
                 docker-compose stop
                 docker-compose up -d --build --force-recreate
-                docker-compose exec keycloak sh -c 'cd /opt/jboss/keycloak/bin/ && ./kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user '$(shell echo $$KEYCLOAK_USER)' --password $(shell echo $$KEYCLOAK_PASSWORD) && ./kcadm.sh update realms/master -s sslRequired=NONE'
+                docker-compose exec keycloak sh -c 'cd /opt/jboss/keycloak/bin/ && ./kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user $$KEYCLOAK_USER --password $$KEYCLOAK_PASSWORD && ./kcadm.sh update realms/master -s sslRequired=NONE'
                 docker container prune -f
                 docker image prune -f
                 docker network prune -f
