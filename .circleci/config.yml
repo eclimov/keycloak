@@ -7,12 +7,15 @@ jobs:
     steps:
       - deploy:
           name: Deploy application to Digital Ocean
+          # Reset and update WC, recreate container and disable requiring HTTPS for keycloak
           command: |
             ssh -o "StrictHostKeyChecking no" $DEPLOY_USER@$DEPLOY_HOST bash -c "
                 cd /root/opt/keycloak
                 git reset --hard
                 git pull
-                docker-compose up -d
+                docker-compose stop
+                docker-compose up -d --build --force-recreate
+                docker-compose exec keycloak sh -c 'cd /opt/jboss/keycloak/bin/ && ./kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user $KEYCLOAK_USER --password $KEYCLOAK_PASSWORD && ./kcadm.sh update realms/master -s sslRequired=NONE'
                 docker container prune -f
                 docker image prune -f
                 docker network prune -f
