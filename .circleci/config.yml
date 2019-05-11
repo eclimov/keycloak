@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    working_directory: /dockerapp
+    docker:
+      - image: docker:18.05.0-ce-git
+    steps:
+      - deploy:
+          name: Deploy application to Digital Ocean
+          command: |
+            ssh -o "StrictHostKeyChecking no" $DEPLOY_USER@$DEPLOY_HOST bash -c "
+                cd /root/opt/keycloak
+                git reset --hard
+                git pull
+                docker-compose up -d
+                docker container prune -f
+                docker image prune -f
+                docker network prune -f
+                docker volume prune -f"
